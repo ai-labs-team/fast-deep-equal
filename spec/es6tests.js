@@ -1,11 +1,14 @@
 'use strict';
 
-class MyMap extends Map {}
-class MySet extends Set {}
+class MyMap extends Map { }
+class MySet extends Set { }
 var emptyObj = {};
 
 var skipBigInt = typeof BigInt == 'undefined';
 var skipBigIntArray = typeof BigUint64Array == 'undefined';
+
+var keyA = Symbol.for('@ai-labs/fast-deep-equal/a');
+var keyB = Symbol.for('@ai-labs/fast-deep-equal/b');
 
 module.exports = [
   {
@@ -45,62 +48,62 @@ module.exports = [
       },
       {
         description: 'equal maps (same key "order")',
-        value1: map({a: 1, b: '2'}),
-        value2: map({a: 1, b: '2'}),
+        value1: map({ a: 1, b: '2' }),
+        value2: map({ a: 1, b: '2' }),
         equal: true
       },
       {
         description: 'not equal maps (same key "order" - instances of different classes)',
-        value1: map({a: 1, b: '2'}),
-        value2: myMap({a: 1, b: '2'}),
+        value1: map({ a: 1, b: '2' }),
+        value2: myMap({ a: 1, b: '2' }),
         equal: false
       },
       {
         description: 'equal maps (different key "order")',
-        value1: map({a: 1, b: '2'}),
-        value2: map({b: '2', a: 1}),
+        value1: map({ a: 1, b: '2' }),
+        value2: map({ b: '2', a: 1 }),
         equal: true
       },
       {
         description: 'equal maps (different key "order" - instances of the same subclass)',
-        value1: myMap({a: 1, b: '2'}),
-        value2: myMap({b: '2', a: 1}),
+        value1: myMap({ a: 1, b: '2' }),
+        value2: myMap({ b: '2', a: 1 }),
         equal: true
       },
       {
         description: 'not equal maps (extra key)',
-        value1: map({a: 1, b: '2'}),
-        value2: map({a: 1, b: '2', c: []}),
+        value1: map({ a: 1, b: '2' }),
+        value2: map({ a: 1, b: '2', c: [] }),
         equal: false
       },
       {
         description: 'not equal maps (different key value)',
-        value1: map({a: 1, b: '2', c: 3}),
-        value2: map({a: 1, b: '2', c: 4}),
+        value1: map({ a: 1, b: '2', c: 3 }),
+        value2: map({ a: 1, b: '2', c: 4 }),
         equal: false
       },
       {
         description: 'not equal maps (different keys)',
-        value1: map({a: 1, b: '2', c: 3}),
-        value2: map({a: 1, b: '2', d: 3}),
+        value1: map({ a: 1, b: '2', c: 3 }),
+        value2: map({ a: 1, b: '2', d: 3 }),
         equal: false
       },
       {
         description: 'equal maps (same sub-keys)',
-        value1: map({ a: [ map({ b: 'c' }) ] }),
-        value2: map({ a: [ map({ b: 'c' }) ] }),
+        value1: map({ a: [map({ b: 'c' })] }),
+        value2: map({ a: [map({ b: 'c' })] }),
         equal: true
       },
       {
         description: 'not equal maps (different sub-key value)',
-        value1: map({ a: [ map({ b: 'c' }) ] }),
-        value2: map({ a: [ map({ b: 'd' }) ] }),
+        value1: map({ a: [map({ b: 'c' })] }),
+        value2: map({ a: [map({ b: 'd' })] }),
         equal: false
       },
       {
         description: 'not equal maps (different sub-key)',
-        value1: map({ a: [ map({ b: 'c' }) ] }),
-        value2: map({ a: [ map({ c: 'c' }) ] }),
+        value1: map({ a: [map({ b: 'c' })] }),
+        value2: map({ a: [map({ c: 'c' })] }),
         equal: false
       },
       {
@@ -112,19 +115,19 @@ module.exports = [
       {
         description: 'map with extra undefined key is not equal #1',
         value1: map({}),
-        value2: map({foo: undefined}),
+        value2: map({ foo: undefined }),
         equal: false
       },
       {
         description: 'map with extra undefined key is not equal #2',
-        value1: map({foo: undefined}),
+        value1: map({ foo: undefined }),
         value2: map({}),
         equal: false
       },
       {
         description: 'maps with extra undefined keys are not equal #3',
-        value1: map({foo: undefined}),
-        value2: map({bar: undefined}),
+        value1: map({ foo: undefined }),
+        value2: map({ bar: undefined }),
         equal: false
       },
       {
@@ -206,14 +209,14 @@ module.exports = [
       },
       {
         description: 'not equal sets (different instances of objects)',
-        value1: set([ 'a', {} ]),
-        value2: set([ 'a', {} ]),
+        value1: set(['a', {}]),
+        value2: set(['a', {}]),
         equal: false
       },
       {
         description: 'equal sets (same instances of objects)',
-        value1: set([ 'a', emptyObj ]),
-        value2: set([ 'a', emptyObj ]),
+        value1: set(['a', emptyObj]),
+        value2: set(['a', emptyObj]),
         equal: true
       },
       {
@@ -308,13 +311,91 @@ module.exports = [
       },
       {
         description: 'pseudo array and equivalent typed array are not equal',
-        value1: {'0': 1, '1': 2, length: 2, constructor: Int32Array},
+        value1: { '0': 1, '1': 2, length: 2, constructor: Int32Array },
         value2: new Int32Array([1, 2]),
         equal: false
       }
     ]
-  }
-];
+  },
+  {
+    description: 'symbols',
+    tests: [
+      {
+        description: 'as keys of scalars, equal',
+        value1: {
+          [keyA]: 'value1',
+        },
+        value2: {
+          [keyA]: 'value1',
+        },
+        equal: true
+      },
+      {
+        description: 'as keys of scalars, not equal',
+        value1: {
+          [keyA]: 'value1',
+        },
+        value2: {
+          [keyA]: 'value2',
+        },
+        equal: false
+      },
+      {
+        description: 'as keys of objects, equal',
+        value1: {
+          [keyA]: {},
+        },
+        value2: {
+          [keyA]: {},
+        },
+        equal: true
+      },
+      {
+        description: 'as keys of objects, not equal',
+        value1: {
+          [keyA]: {},
+        },
+        value2: {
+          [keyA]: [],
+        },
+        equal: false
+      },
+      {
+        description: 'keys, multiple, ordered',
+        value1: {
+          [keyA]: 1,
+          [keyB]: 2,
+        },
+        value2: {
+          [keyB]: 2,
+          [keyA]: 1,
+        },
+        equal: true
+      },
+      {
+        description: 'keys, additive',
+        value1: {
+          [keyA]: {},
+        },
+        value2: {
+          [keyA]: {},
+          [keyB]: {},
+        },
+        equal: false
+      },
+      {
+        description: 'keys, subtractive',
+        value1: {
+          [keyA]: {},
+        },
+        value2: {
+          [keyA]: {},
+          [keyB]: {},
+        },
+        equal: false
+      },
+    ]
+  }];
 
 function map(obj, Class) {
   var a = new (Class || Map);
