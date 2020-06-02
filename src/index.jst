@@ -45,7 +45,9 @@ module.exports = function equal(a, b) {
         if (a[i] !== b[i]) return false;
       return true;
     }
+{{?}}
 
+{{? it.es6 || it.react }}
     keys = Object.getOwnPropertySymbols(a);
     length = keys.length;
     if (length !== Object.getOwnPropertySymbols(b).length) return false;
@@ -54,8 +56,8 @@ module.exports = function equal(a, b) {
       if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
 
     for (i = length; i-- !== 0;) {
-      var key = keys[i];
-      if (!equal(a[key], b[key])) return false;
+      var sk = keys[i];
+      if (!equal(a[sk], b[sk])) return false;
     }
 {{?}}
 
